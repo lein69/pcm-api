@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import axios from 'axios'
+import apiClient from '@/api'
 
 export const useDataStore = defineStore('data', () => {
   const members = ref([])
@@ -13,64 +13,64 @@ export const useDataStore = defineStore('data', () => {
 
   const fetchMembers = async () => {
     try {
-      const response = await axios.get('http://localhost:7183/api/members')
+      const response = await apiClient.get('/members')
       members.value = response.data
     } catch (error) {
-      console.error('Failed to fetch members')
+      console.error('Failed to fetch members', error)
     }
   }
 
   const fetchCourts = async () => {
     try {
-      const response = await axios.get('http://localhost:7183/api/courts')
+      const response = await apiClient.get('/courts')
       courts.value = response.data
     } catch (error) {
-      console.error('Failed to fetch courts')
+      console.error('Failed to fetch courts', error)
     }
   }
 
   const fetchBookings = async () => {
     try {
-      const response = await axios.get('http://localhost:7183/api/bookings')
+      const response = await apiClient.get('/bookings')
       bookings.value = response.data
     } catch (error) {
-      console.error('Failed to fetch bookings')
+      console.error('Failed to fetch bookings', error)
     }
   }
 
   const fetchChallenges = async () => {
     try {
-      const response = await axios.get('http://localhost:7183/api/challenges')
+      const response = await apiClient.get('/challenges')
       challenges.value = response.data
     } catch (error) {
-      console.error('Failed to fetch challenges')
+      console.error('Failed to fetch challenges', error)
     }
   }
 
   const fetchMatches = async () => {
     try {
-      const response = await axios.get('http://localhost:7183/api/matches')
+      const response = await apiClient.get('/matches')
       matches.value = response.data
     } catch (error) {
-      console.error('Failed to fetch matches')
+      console.error('Failed to fetch matches', error)
     }
   }
 
   const fetchTransactions = async () => {
     try {
-      const response = await axios.get('http://localhost:7183/api/transactions')
+      const response = await apiClient.get('/transactions')
       transactions.value = response.data
     } catch (error) {
-      console.error('Failed to fetch transactions')
+      console.error('Failed to fetch transactions', error)
     }
   }
 
   const fetchNews = async () => {
     try {
-      const response = await axios.get('http://localhost:7183/api/news')
+      const response = await apiClient.get('/news')
       news.value = response.data
     } catch (error) {
-      console.error('Failed to fetch news')
+      console.error('Failed to fetch news', error)
     }
   }
 

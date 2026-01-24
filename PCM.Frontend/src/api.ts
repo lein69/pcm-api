@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const apiClient = axios.create({
   // Sử dụng biến môi trường hoặc fallback về localhost
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:7183/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://localhost:7183/api',
   headers: {
     'Content-Type': 'application/json'
   }
