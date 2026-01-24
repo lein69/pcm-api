@@ -1,109 +1,88 @@
-# PCM - Pickleball Club Management System
+# HỆ THỐNG QUẢN LÝ CLB PICKLEBALL "VỢT THỦ PHỐ NÚI" (PCM)
 
-A full-stack web application for managing a pickleball club, built with ASP.NET Core Web API and Vue.js.
+Đây là một dự án Fullstack bao gồm Backend sử dụng ASP.NET Core Web API và Frontend sử dụng Vue.js để quản lý các hoạt động của một câu lạc bộ Pickleball.
 
-## Features
-
-- User authentication and authorization (JWT)
-- Member management
-- Court booking system
-- Match scheduling and tracking
-- Challenge system
-- News and notifications
-- Activity logging
-- Transaction management
-
-## Tech Stack
+## Công nghệ sử dụng
 
 ### Backend
-- ASP.NET Core 9.0 Web API
-- Entity Framework Core
-- SQL Server
-- JWT Authentication
-- ASP.NET Identity
+-   ASP.NET Core 8 Web API
+-   Entity Framework Core 8
+-   SQL Server
+-   ASP.NET Core Identity for user management
+-   JWT (JSON Web Token) for Authentication & Authorization
 
 ### Frontend
-- Vue.js 3
-- TypeScript
-- Vue Router
-- Pinia (State Management)
-- Axios
-- Vite
+-   Vue.js 3 (với Composition API)
+-   Vite
+-   Pinia for state management
+-   Vue Router
+-   Axios
 
-## Getting Started
+## Hướng dẫn cài đặt và chạy dự án
 
-### Prerequisites
-- .NET 9.0 SDK
-- Node.js 18+
-- SQL Server
+### Yêu cầu
+-   [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+-   [Node.js](https://nodejs.org/) (LTS version)
+-   [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) (Express, Developer, hoặc phiên bản khác)
+-   [Git](https://git-scm.com/)
 
-### Backend Setup
-1. Navigate to the backend directory:
-   ```bash
-   cd PCM.Api
-   ```
+### 1. Cài đặt Backend (PCM.Api)
 
-2. Restore packages:
-   ```bash
-   dotnet restore
-   ```
+1.  **Clone repository:**
+    ```bash
+    git clone <your-repository-url>
+    cd <repository-folder>
+    ```
 
-3. Update the connection string in `appsettings.json` if needed.
+2.  **Cấu hình Connection String:**
+    -   Mở project `PCM.Api` trong Visual Studio hoặc VS Code.
+    -   Tìm và mở file `appsettings.json`.
+    -   Chỉnh sửa chuỗi `DefaultConnection` để trỏ tới instance SQL Server của bạn.
 
-4. Run database migrations:
-   ```bash
-   dotnet ef database update
-   ```
+    ```json
+    "ConnectionStrings": {
+      "DefaultConnection": "Server=YOUR_SERVER_NAME;Database=PCM_Db;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=true"
+    }
+    ```
 
-5. Run the API:
-   ```bash
-   dotnet run
-   ```
+3.  **Áp dụng Database Migrations:**
+    -   Mở terminal trong thư mục `PCM.Api/PCM.Api`.
+    -   Chạy lệnh sau để tạo và seeding cơ sở dữ liệu:
+    ```bash
+    dotnet ef database update
+    ```
+    *Lệnh này sẽ tự động tạo các bảng và chèn dữ liệu mẫu (admin, members, courts...).*
 
-The API will be available at `https://localhost:5001` (or `http://localhost:5000`).
+4.  **Chạy Backend:**
+    -   Bạn có thể chạy project từ Visual Studio (bấm F5) hoặc dùng lệnh trong thư mục `PCM.Api/PCM.Api`:
+    ```bash
+    dotnet run
+    ```
+    -   API sẽ có sẵn tại `https://localhost:7183`.
+    -   Tài liệu API (Swagger) có thể được truy cập tại `https://localhost:7183/swagger`.
 
-### Frontend Setup
-1. Navigate to the frontend directory:
-   ```bash
-   cd PCM.Frontend
-   ```
+### 2. Cài đặt Frontend (PCM.Frontend)
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+1.  **Cài đặt dependencies:**
+    -   Mở một terminal khác và di chuyển vào thư mục `PCM.Frontend`:
+    ```bash
+    cd PCM.Frontend
+    ```
+    -   Chạy lệnh sau:
+    ```bash
+    npm install
+    ```
 
-3. Run the development server:
-   ```bash
-   npm run dev
-   ```
+2.  **Chạy Frontend:**
+    -   Sau khi cài đặt xong, chạy development server:
+    ```bash
+    npm run dev
+    ```
+    -   Ứng dụng web sẽ có sẵn tại `http://localhost:5173`.
 
-The frontend will be available at `http://localhost:5173`.
+## Tài khoản đăng nhập mặc định
 
-## API Documentation
+Hệ thống đã được seeding sẵn một tài khoản Admin để bạn có thể đăng nhập và sử dụng các tính năng quản trị ngay lập tức.
 
-Once the backend is running, visit `https://localhost:5001/swagger` for API documentation.
-
-## Database Schema
-
-The application uses Entity Framework Code-First approach. The database includes tables for:
-- Members
-- Courts
-- Bookings
-- Matches
-- Challenges
-- Transactions
-- Activity Logs
-- And more...
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## License
-
-This project is licensed under the MIT License.
+-   **Email:** `admin@pcm.com`
+-   **Password:** `Admin@123`
