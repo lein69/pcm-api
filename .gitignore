@@ -1,0 +1,15 @@
+## .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.db
+
+## Env
+appsettings.Development.json
+.env
+
+## Node
+node_modules/
+dist/
