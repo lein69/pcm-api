@@ -7,6 +7,9 @@ using PCM.Api.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://*:{port}");
+
 
 // ================= DATABASE =================
 
@@ -115,6 +118,7 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+
 
 
 var app = builder.Build();
