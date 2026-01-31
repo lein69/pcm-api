@@ -15,17 +15,17 @@ namespace PCM.Api.Data
         public DbSet<Court> Courts { get; set; } = null!;
         public DbSet<Booking> Bookings { get; set; } = null!;
 
-        public DbSet<News> News { get; set; }
-        public DbSet<TransactionCategory> TransactionCategories { get; set; }
-        public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<News> News { get; set; } = null!;
+        public DbSet<TransactionCategory> TransactionCategories { get; set; } = null!;
+        public DbSet<Transaction> Transactions { get; set; } = null!;
 
-        public DbSet<Challenge> Challenges { get; set; }
-        public DbSet<Match> Matches { get; set; }
-        public DbSet<Participant> Participants { get; set; }
+        public DbSet<Challenge> Challenges { get; set; } = null!;
+        public DbSet<Match> Matches { get; set; } = null!;
+        public DbSet<Participant> Participants { get; set; } = null!;
 
-        public DbSet<MatchScore> MatchScores { get; set; }
-        public DbSet<Notification> Notifications { get; set; }
-        public DbSet<ActivityLog> ActivityLogs { get; set; }
+        public DbSet<MatchScore> MatchScores { get; set; } = null!;
+        public DbSet<Notification> Notifications { get; set; } = null!;
+        public DbSet<ActivityLog> ActivityLogs { get; set; } = null!;
 
 
         // ================= FIX CASCADE =================

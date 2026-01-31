@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using PCM.Api.Enums;
 
@@ -12,11 +12,11 @@ namespace PCM.Api.Models
 
 
         public int ChallengeId { get; set; }
-        public Challenge? Challenge { get; set; }
+        public Challenge Challenge { get; set; } = null!;
 
 
         public int MemberId { get; set; }
-        public Member? Member { get; set; }
+        public Member Member { get; set; } = null!;
 
 
         public TeamSide Team { get; set; }

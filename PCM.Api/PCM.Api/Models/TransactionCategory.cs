@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using PCM.Api.Enums;
 
@@ -11,7 +11,7 @@ namespace PCM.Api.Models
         public int Id { get; set; }
 
         [Required]
-        public string Name { get; set; } = null!;
+        public string Name { get; set; } = string.Empty;
 
         public TransactionType Type { get; set; }
     }

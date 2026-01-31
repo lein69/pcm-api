@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PCM.Api.Models
@@ -17,7 +17,7 @@ namespace PCM.Api.Models
 
 
         public int CategoryId { get; set; }
-        public TransactionCategory? Category { get; set; }
+        public TransactionCategory Category { get; set; } = null!;
 
 
         public int? CreatedById { get; set; }

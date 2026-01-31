@@ -20,35 +20,36 @@ builder.WebHost.UseUrls($"http://*:{port}");
 
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
-if (string.IsNullOrEmpty(databaseUrl))
+string connectionString;
+
+if (!string.IsNullOrWhiteSpace(databaseUrl))
 {
-    throw new Exception("DATABASE_URL not found. Check Railway Variables.");
+    // Railway / Production
+    var uri = new Uri(databaseUrl);
+    var userInfo = uri.UserInfo.Split(':');
+
+    connectionString = new NpgsqlConnectionStringBuilder
+    {
+        Host = uri.Host,
+        Port = uri.Port,
+        Username = userInfo[0],
+        Password = userInfo[1],
+        Database = uri.AbsolutePath.TrimStart('/'),
+        SslMode = SslMode.Require
+    }.ConnectionString;
+}
+else
+{
+    // Local
+    connectionString = builder.Configuration
+        .GetConnectionString("DefaultConnection")
+        ?? throw new Exception("No DB connection string found");
 }
 
-var uri = new Uri(databaseUrl);
-var userInfo = uri.UserInfo.Split(':');
-
-var connectionString = new NpgsqlConnectionStringBuilder
-{
-    Host = uri.Host,
-    Port = uri.Port,
-    Username = userInfo[0],
-    Password = userInfo[1],
-    Database = uri.AbsolutePath.TrimStart('/'),
-    SslMode = SslMode.Require,
-    TrustServerCertificate = true
-}.ConnectionString;
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
-
-
-// ================= IDENTITY =================
-
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
-
+{
+    options.UseNpgsql(connectionString);
+});
 
 // ================= SERVICES =================
 

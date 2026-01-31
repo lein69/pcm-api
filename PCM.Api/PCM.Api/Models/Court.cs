@@ -6,9 +6,10 @@ namespace PCM.Api.Models
     [Table("123_Courts")]
     public class Court
     {
+        [Key]
         public int Id { get; set; }
 
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         public bool IsActive { get; set; } = true;
 
@@ -16,6 +17,6 @@ namespace PCM.Api.Models
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
-        public ICollection<Booking>? Bookings { get; set; }
+        public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
     }
 }

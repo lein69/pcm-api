@@ -29,7 +29,7 @@ namespace PCM.Api.Models
         // ================= TEAM 1 =================
         public int Team1_Player1Id { get; set; }
 
-        public Member? Team1_Player1 { get; set; }
+        public Member Team1_Player1 { get; set; } = null!;
 
 
         public int? Team1_Player2Id { get; set; }
@@ -40,7 +40,7 @@ namespace PCM.Api.Models
         // ================= TEAM 2 =================
         public int Team2_Player1Id { get; set; }
 
-        public Member? Team2_Player1 { get; set; }
+        public Member Team2_Player1 { get; set; } = null!;
 
 
         public int? Team2_Player2Id { get; set; }
