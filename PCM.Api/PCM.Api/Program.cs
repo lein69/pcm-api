@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Npgsql;
 using PCM.Api.Data;
 using PCM.Api.Services;
@@ -14,46 +15,32 @@ var builder = WebApplication.CreateBuilder(args);
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 builder.WebHost.UseUrls($"http://*:{port}");
 
-// ================= DATABASE (POSTGRES) =================
 
-var databaseUrl = Environment.GetEnvironmentVariable("postgresql://postgres:PymXmglHbWCokXWNvmKGCuaBXSvkcBtY@postgres-rz9n.railway.internal:5432/railway");
+// ================= DATABASE (POSTGRES - RAILWAY) =================
 
-string connectionString;
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
-if (!string.IsNullOrEmpty(databaseUrl))
+if (string.IsNullOrEmpty(databaseUrl))
 {
-    var uri = new Uri(databaseUrl);
-    var userInfo = uri.UserInfo.Split(':');
-
-    var csb = new NpgsqlConnectionStringBuilder
-    {
-        Host = uri.Host,
-        Port = uri.Port,
-        Username = userInfo[0],
-        Password = userInfo[1],
-        Database = uri.AbsolutePath.TrimStart('/'),
-        SslMode = SslMode.Require,
-        TrustServerCertificate = true
-    };
-
-    connectionString = csb.ConnectionString;
-}
-else
-{
-    // Local fallback (chạy local)
-    connectionString =
-        builder.Configuration.GetConnectionString("DefaultConnection")!;
+    throw new Exception("DATABASE_URL not found. Check Railway Variables.");
 }
 
-var dbUrl = Environment.GetEnvironmentVariable("postgresql://postgres:PymXmglHbWCokXWNvmKGCuaBXSvkcBtY@postgres-rz9n.railway.internal:5432/railway");
+var uri = new Uri(databaseUrl);
+var userInfo = uri.UserInfo.Split(':');
 
-if (string.IsNullOrEmpty(dbUrl))
+var connectionString = new NpgsqlConnectionStringBuilder
 {
-    throw new Exception("DATABASE_URL not found");
-}
+    Host = uri.Host,
+    Port = uri.Port,
+    Username = userInfo[0],
+    Password = userInfo[1],
+    Database = uri.AbsolutePath.TrimStart('/'),
+    SslMode = SslMode.Require,
+    TrustServerCertificate = true
+}.ConnectionString;
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(dbUrl));
+    options.UseNpgsql(connectionString));
 
 
 // ================= IDENTITY =================
@@ -62,23 +49,19 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+
 // ================= SERVICES =================
 
 builder.Services.AddScoped<IMatchService, MatchService>();
 
-// ================= JWT CONFIG =================
 
-var jwtKey = builder.Configuration.GetValue<string>("Jwt:Key");
+// ================= JWT =================
 
-if (string.IsNullOrEmpty(jwtKey))
-{
-    jwtKey = "PCM_DEFAULT_SECRET_KEY_123456789_ABC";
-}
+var jwtKey = builder.Configuration["Jwt:Key"]
+             ?? "PCM_DEFAULT_SECRET_KEY_123456789_ABC";
 
-var jwtIssuer = builder.Configuration.GetValue<string>("Jwt:Issuer") ?? "PCM.Api";
-var jwtAudience = builder.Configuration.GetValue<string>("Jwt:Audience") ?? "PCM.Client";
-
-// ================= AUTH =================
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "PCM.Api";
+var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "PCM.Client";
 
 builder.Services.AddAuthentication(options =>
 {
@@ -102,9 +85,11 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+
 // ================= CONTROLLERS =================
 
 builder.Services.AddControllers();
+
 
 // ================= CORS =================
 
@@ -115,42 +100,42 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins("https://pcm-pickleball.netlify.app")
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
-
 
 
 // ================= SWAGGER =================
 
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen(options =>
+builder.Services.AddSwaggerGen(c =>
 {
-    options.SwaggerDoc("v1", new()
+    c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "PCM API",
         Version = "v1"
     });
 
-    options.AddSecurityDefinition("Bearer", new()
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer",
         BearerFormat = "JWT",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Description = "Enter: Bearer {your_token}"
+        In = ParameterLocation.Header,
+        Description = "Enter: Bearer {token}"
     });
 
-    options.AddSecurityRequirement(new()
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
-            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            new OpenApiSecurityScheme
             {
-                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                Reference = new OpenApiReference
                 {
-                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Type = ReferenceType.SecurityScheme,
                     Id = "Bearer"
                 }
             },
@@ -159,9 +144,14 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+
+// ================= BUILD APP =================
+
 var app = builder.Build();
 
-// ================= MIDDLEWARE =================
+
+// ================= AUTO MIGRATE =================
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider
@@ -170,15 +160,13 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
+
+// ================= MIDDLEWARE =================
+
 app.UseCors("AllowFrontend");
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
-if (!app.Environment.IsProduction())
-{
-    app.UseHttpsRedirection();
-}
 
 app.UseAuthentication();
 app.UseAuthorization();
