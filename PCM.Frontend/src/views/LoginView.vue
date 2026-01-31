@@ -2,12 +2,16 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import api from "@/api"
 
 const router = useRouter()
 const authStore = useAuthStore()
 
 const email = ref('')
 const password = ref('')
+const fullName = ref('')
+const confirmPassword = ref('')
+const isRegistering = ref(false)
 const message = ref('')
 const isLoading = ref(false)
 
@@ -22,6 +26,32 @@ const login = async () => {
     message.value = 'Đăng nhập thất bại! Vui lòng kiểm tra thông tin.'
   }
   isLoading.value = false
+}
+
+const register = async () => {
+  if (password.value !== confirmPassword.value) {
+    message.value = 'Mật khẩu xác nhận không khớp!'
+    return
+  }
+
+  isLoading.value = true
+  message.value = ''
+
+  try {
+    await api.post('/auth/register', {
+      fullName: fullName.value,
+      email: email.value,
+      password: password.value
+    })
+    message.value = 'Đăng ký thành công! Vui lòng đăng nhập.'
+    isRegistering.value = false
+    password.value = ''
+    confirmPassword.value = ''
+  } catch (error: any) {
+    message.value = error.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại.'
+  } finally {
+    isLoading.value = false
+  }
 }
 
 const quickLogin = async (username: string, pwd: string) => {
@@ -43,10 +73,22 @@ const quickLogin = async (username: string, pwd: string) => {
     <div class="login-card">
       <div class="login-header">
         <h2>🎾 PCM Pickleball Club</h2>
-        <p>Đăng nhập vào hệ thống quản lý</p>
+        <p>{{ isRegistering ? 'Đăng ký thành viên mới' : 'Đăng nhập vào hệ thống quản lý' }}</p>
       </div>
 
-      <form @submit.prevent="login" class="login-form">
+      <form @submit.prevent="isRegistering ? register() : login()" class="login-form">
+        <div v-if="isRegistering" class="form-group">
+          <label for="fullName">Họ và tên</label>
+          <input 
+            id="fullName"
+            v-model="fullName" 
+            type="text" 
+            placeholder="Nhập họ tên đầy đủ"
+            required 
+            class="form-input"
+          />
+        </div>
+
         <div class="form-group">
           <label for="email">Tên đăng nhập hoặc Email</label>
           <input 
@@ -71,11 +113,34 @@ const quickLogin = async (username: string, pwd: string) => {
           />
         </div>
 
+        <div v-if="isRegistering" class="form-group">
+          <label for="confirmPassword">Xác nhận mật khẩu</label>
+          <input 
+            id="confirmPassword"
+            v-model="confirmPassword" 
+            type="password" 
+            placeholder="Nhập lại mật khẩu"
+            required 
+            class="form-input"
+          />
+        </div>
+
         <button type="submit" class="login-btn" :disabled="isLoading">
-          <span v-if="isLoading">Đang đăng nhập...</span>
-          <span v-else>Đăng nhập</span>
+          <span v-if="isLoading">Đang xử lý...</span>
+          <span v-else>{{ isRegistering ? 'Đăng ký' : 'Đăng nhập' }}</span>
         </button>
       </form>
+
+      <div class="toggle-mode">
+        <p v-if="!isRegistering">
+          Chưa có tài khoản? 
+          <a href="#" @click.prevent="isRegistering = true; message = ''">Đăng ký ngay</a>
+        </p>
+        <p v-else>
+          Đã có tài khoản? 
+          <a href="#" @click.prevent="isRegistering = false; message = ''">Đăng nhập</a>
+        </p>
+      </div>
 
       <div v-if="message" class="alert alert-error">
         {{ message }}
@@ -252,6 +317,17 @@ const quickLogin = async (username: string, pwd: string) => {
   background-color: #fee;
   color: #c33;
   border: 1px solid #fcc;
+}
+
+.toggle-mode {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.toggle-mode a {
+  color: #667eea;
+  font-weight: 600;
+  text-decoration: none;
 }
 
 .divider {
