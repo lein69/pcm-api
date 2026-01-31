@@ -140,11 +140,8 @@ using (var scope = app.Services.CreateScope())
 
 // ================= MIDDLEWARE =================
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseCors("AllowAll");
 
