@@ -26,6 +26,6 @@ namespace PCM.Api.Models
 
         public string? Notes { get; set; }
 
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     }
 }

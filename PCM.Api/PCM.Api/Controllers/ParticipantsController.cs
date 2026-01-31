@@ -39,7 +39,7 @@ namespace PCM.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Participant p)
         {
-            p.JoinedDate = DateTime.Now;
+            p.JoinedDate = DateTime.UtcNow;
 
             _context.Participants.Add(p);
             await _context.SaveChangesAsync();

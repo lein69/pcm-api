@@ -30,7 +30,7 @@ namespace PCM.Api.Models
         public int TotalMatches { get; set; }
         public int WinMatches { get; set; }
 
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
-        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+        public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
     }
 }

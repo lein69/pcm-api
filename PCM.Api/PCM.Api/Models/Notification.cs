@@ -25,7 +25,7 @@ namespace PCM.Api.Models
         public bool IsRead { get; set; }
 
 
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         public string? LinkUrl { get; set; }
     }

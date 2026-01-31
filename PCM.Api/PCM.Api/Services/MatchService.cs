@@ -26,14 +26,14 @@ namespace PCM.Api.Services
                 winner.RankLevel += 0.1;
                 winner.WinMatches++;
                 winner.TotalMatches++;
-                winner.ModifiedDate = DateTime.Now;
+                winner.ModifiedDate = DateTime.UtcNow;
             }
 
             foreach (var loser in losers)
             {
                 loser.RankLevel = Math.Max(0, loser.RankLevel - 0.1);
                 loser.TotalMatches++;
-                loser.ModifiedDate = DateTime.Now;
+                loser.ModifiedDate = DateTime.UtcNow;
             }
 
             await _context.SaveChangesAsync();
@@ -67,7 +67,7 @@ namespace PCM.Api.Services
                 }
             }
 
-            challenge.ModifiedDate = DateTime.Now;
+            challenge.ModifiedDate = DateTime.UtcNow;
             await _context.SaveChangesAsync();
         }
 

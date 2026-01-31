@@ -15,7 +15,7 @@ namespace PCM.Api.Models
 
         public string? Description { get; set; }
 
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
     }

@@ -145,13 +145,13 @@ namespace PCM.Api.Controllers
                 PhoneNumber = dto.PhoneNumber,
                 DateOfBirth = dto.DateOfBirth,
                 UserId = user.Id,
-                JoinDate = DateTime.Now,
+                JoinDate = DateTime.UtcNow,
                 IsActive = true,
                 RankLevel = 0,
                 TotalMatches = 0,
                 WinMatches = 0,
-                CreatedDate = DateTime.Now,
-                ModifiedDate = DateTime.Now
+                CreatedDate = DateTime.UtcNow,
+                ModifiedDate = DateTime.UtcNow
             };
 
             _context.Members.Add(member);

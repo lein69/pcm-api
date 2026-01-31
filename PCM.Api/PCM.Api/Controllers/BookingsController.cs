@@ -90,12 +90,12 @@ namespace PCM.Api.Controllers
                 return BadRequest("End time must be after start time.");
             }
 
-            if (booking.StartTime < DateTime.Now)
+            if (booking.StartTime < DateTime.UtcNow)
             {
                 return BadRequest("Cannot book in the past.");
             }
 
-            booking.CreatedDate = DateTime.Now;
+            booking.CreatedDate = DateTime.UtcNow;
 
             _context.Bookings.Add(booking);
             await _context.SaveChangesAsync();

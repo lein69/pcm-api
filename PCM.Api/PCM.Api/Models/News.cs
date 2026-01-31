@@ -17,6 +17,6 @@ namespace PCM.Api.Models
 
         public bool IsPinned { get; set; }
 
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     }
 }

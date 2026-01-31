@@ -21,6 +21,6 @@ namespace PCM.Api.Models
 
         public string? IpAddress { get; set; }
 
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     }
 }

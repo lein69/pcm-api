@@ -10,9 +10,13 @@ namespace PCM.Api.Data
         {
             Console.WriteLine(">>> START SEEDING DATABASE <<<");
 
-            var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
-            var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            using var scope = serviceProvider.CreateScope();
+
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            var now = DateTime.UtcNow;
 
             // ================= ROLES =================
 
@@ -57,11 +61,11 @@ namespace PCM.Api.Data
                     Email = "admin@pcm.com",
                     PhoneNumber = "0000000000",
                     UserId = adminUser.Id,
-                    JoinDate = DateTime.Now,
+                    JoinDate = now,
                     RankLevel = 5,
                     IsActive = true,
-                    CreatedDate = DateTime.Now,
-                    ModifiedDate = DateTime.Now
+                    CreatedDate = now,
+                    ModifiedDate = now
                 };
 
                 context.Members.Add(adminMember);
@@ -104,11 +108,11 @@ namespace PCM.Api.Data
                             Email = data.Email,
                             PhoneNumber = data.Phone,
                             UserId = user.Id,
-                            JoinDate = DateTime.Now.AddDays(-Random.Shared.Next(1, 300)),
+                            JoinDate = now.AddDays(-Random.Shared.Next(1, 300)),
                             RankLevel = 3 + Random.Shared.NextDouble() * 2,
                             IsActive = true,
-                            CreatedDate = DateTime.Now,
-                            ModifiedDate = DateTime.Now
+                            CreatedDate = now,
+                            ModifiedDate = now
                         };
 
                         context.Members.Add(member);
@@ -128,14 +132,14 @@ namespace PCM.Api.Data
                         Name = "Sân 1",
                         IsActive = true,
                         Description = "Sân chính",
-                        CreatedDate = DateTime.Now
+                        CreatedDate = now
                     },
                     new Court
                     {
                         Name = "Sân 2",
                         IsActive = true,
                         Description = "Sân phụ",
-                        CreatedDate = DateTime.Now
+                        CreatedDate = now
                     }
                 );
 
@@ -168,7 +172,7 @@ namespace PCM.Api.Data
                     context.Transactions.AddRange(
                         new Transaction
                         {
-                            Date = DateTime.Now.AddDays(-10),
+                            Date = now.AddDays(-10),
                             Amount = 1000000,
                             Description = "Quỹ tháng 1",
                             CategoryId = 1,
@@ -176,7 +180,7 @@ namespace PCM.Api.Data
                         },
                         new Transaction
                         {
-                            Date = DateTime.Now.AddDays(-5),
+                            Date = now.AddDays(-5),
                             Amount = -200000,
                             Description = "Mua nước",
                             CategoryId = 3,
@@ -207,8 +211,8 @@ namespace PCM.Api.Data
                         EntryFee = 50000,
                         PrizePool = 500000,
                         CreatedById = adminMember.Id,
-                        StartDate = DateTime.Now.AddDays(-7),
-                        CreatedDate = DateTime.Now
+                        StartDate = now.AddDays(-7),
+                        CreatedDate = now
                     };
 
                     context.Challenges.Add(challenge);
@@ -216,18 +220,16 @@ namespace PCM.Api.Data
 
                     var participants = context.Members.Take(6).ToList();
 
-                    foreach (var member in participants)
+                    for (int i = 0; i < participants.Count; i++)
                     {
                         context.Participants.Add(new Participant
                         {
                             ChallengeId = challenge.Id,
-                            MemberId = member.Id,
-                            Team = participants.IndexOf(member) % 2 == 0
-                                ? TeamSide.TeamA
-                                : TeamSide.TeamB,
+                            MemberId = participants[i].Id,
+                            Team = i % 2 == 0 ? TeamSide.TeamA : TeamSide.TeamB,
                             EntryFeePaid = true,
                             Status = ParticipantStatus.Confirmed,
-                            JoinedDate = DateTime.Now.AddDays(-7)
+                            JoinedDate = now.AddDays(-7)
                         });
                     }
 

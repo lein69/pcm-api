@@ -23,6 +23,6 @@ namespace PCM.Api.Models
         public int? CreatedById { get; set; }
         public Member? CreatedBy { get; set; }
 
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     }
 }

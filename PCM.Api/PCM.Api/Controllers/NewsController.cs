@@ -25,7 +25,7 @@ namespace PCM.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(News news)
         {
-            news.CreatedDate = DateTime.Now;
+            news.CreatedDate = DateTime.UtcNow;
 
             _context.News.Add(news);
             await _context.SaveChangesAsync();

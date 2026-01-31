@@ -45,7 +45,7 @@ namespace PCM.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Transaction t)
         {
-            t.CreatedDate = DateTime.Now;
+            t.CreatedDate = DateTime.UtcNow;
 
             _context.Transactions.Add(t);
             await _context.SaveChangesAsync();

@@ -39,7 +39,7 @@ namespace PCM.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Challenge challenge)
         {
-            challenge.CreatedDate = DateTime.Now;
+            challenge.CreatedDate = DateTime.UtcNow;
 
             _context.Challenges.Add(challenge);
             await _context.SaveChangesAsync();
@@ -53,7 +53,7 @@ namespace PCM.Api.Controllers
             if (id != challenge.Id)
                 return BadRequest();
 
-            challenge.ModifiedDate = DateTime.Now;
+            challenge.ModifiedDate = DateTime.UtcNow;
 
             _context.Entry(challenge).State = EntityState.Modified;
             await _context.SaveChangesAsync();
@@ -83,7 +83,7 @@ namespace PCM.Api.Controllers
                 MemberId = memberId,
                 EntryFeePaid = false,
                 EntryFeeAmount = challenge.EntryFee,
-                JoinedDate = DateTime.Now,
+                JoinedDate = DateTime.UtcNow,
                 Status = ParticipantStatus.Pending
             };
 
