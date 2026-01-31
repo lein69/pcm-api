@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useDataStore } from '../stores/data'
 import api from "@/api"
 
@@ -35,6 +35,44 @@ onMounted(() => {
   dataStore.fetchBookings()
   dataStore.fetchCourts()
 })
+
+// --- Admin Logic ---
+const showEditModal = ref(false)
+const editForm = reactive({
+  id: 0,
+  status: '',
+  notes: ''
+})
+
+const openEditModal = (booking: Booking) => {
+  editForm.id = booking.id
+  editForm.status = booking.status
+  editForm.notes = booking.notes
+  showEditModal.value = true
+}
+
+const handleUpdate = async () => {
+  try {
+    await api.put(`/bookings/${editForm.id}`, editForm)
+    alert('Cập nhật thành công')
+    showEditModal.value = false
+    dataStore.fetchBookings()
+  } catch (e) {
+    console.error(e)
+    alert('Lỗi cập nhật')
+  }
+}
+
+const handleDelete = async (id: number) => {
+  if(!confirm('Bạn có chắc muốn hủy/xóa lịch này?')) return
+  try {
+    await api.delete(`/bookings/${id}`)
+    dataStore.fetchBookings()
+  } catch (e) {
+    console.error(e)
+    alert('Lỗi xóa')
+  }
+}
 
 const createBooking = async () => {
   if (isSubmitting.value) return
@@ -180,9 +218,35 @@ const getStatusText = (status: string) => {
                 <span class="notes-label">Ghi chú:</span>
                 <span>{{ booking.notes }}</span>
               </div>
+              <div class="admin-actions">
+                <button class="btn-sm edit" @click="openEditModal(booking)">Sửa</button>
+                <button class="btn-sm delete" @click="handleDelete(booking.id)">Xóa</button>
+              </div>
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div v-if="showEditModal" class="modal-overlay" @click.self="showEditModal = false">
+      <div class="modal-content">
+        <h3>Cập nhật trạng thái</h3>
+        <form @submit.prevent="handleUpdate">
+          <div class="form-group">
+            <label>Trạng thái:</label>
+            <select v-model="editForm.status" class="form-control">
+              <option value="Pending">Chờ xác nhận</option>
+              <option value="Confirmed">Đã xác nhận</option>
+              <option value="Cancelled">Đã hủy</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Ghi chú:</label>
+            <textarea v-model="editForm.notes" class="form-control"></textarea>
+          </div>
+          <button type="submit" class="btn-primary">Lưu thay đổi</button>
+        </form>
       </div>
     </div>
   </div>
@@ -347,5 +411,26 @@ label {
 .empty-icon {
   font-size: 48px;
   margin-bottom: 10px;
+}
+
+.admin-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+.btn-sm {
+  padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;
+}
+.btn-sm.edit { background: #f59e0b; color: white; }
+.btn-sm.delete { background: #ef4444; color: white; }
+
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5); z-index: 1000;
+  display: flex; justify-content: center; align-items: center;
+}
+.modal-content {
+  background: white; padding: 20px; border-radius: 8px; width: 300px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 </style>
