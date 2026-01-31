@@ -147,13 +147,14 @@ using (var scope = app.Services.CreateScope())
         // [CỰC KỲ QUAN TRỌNG]
         // Dòng này sẽ XÓA SẠCH database cũ để sửa lỗi "relation already exists".
         // Sau khi web chạy ngon lành, hãy xóa dòng này đi để tránh mất dữ liệu.
-        //db.Database.EnsureDeleted(); 
+        db.Database.EnsureDeleted(); 
 
         // Tạo lại database mới tinh từ đầu
         db.Database.Migrate();
         Console.WriteLine("--> Database đã được Reset và Update thành công!");
 
         // Gọi hàm Seed dữ liệu (Tạo Admin, Member, Court...)
+        Console.WriteLine(">>> CALLING SEED <<<");
         await DbInitializer.SeedAsync(services);
     }
     catch (Exception ex)
