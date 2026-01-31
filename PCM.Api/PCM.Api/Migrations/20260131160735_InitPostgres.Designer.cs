@@ -12,7 +12,7 @@ using PCM.Api.Data;
 namespace PCM.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260131152350_InitPostgres")]
+    [Migration("20260131160735_InitPostgres")]
     partial class InitPostgres
     {
         /// <inheritdoc />
