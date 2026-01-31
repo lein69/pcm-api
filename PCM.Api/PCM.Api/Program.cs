@@ -152,6 +152,9 @@ using (var scope = app.Services.CreateScope())
         // Tạo lại database mới tinh từ đầu
         db.Database.Migrate();
         Console.WriteLine("--> Database đã được Reset và Update thành công!");
+
+        // Gọi hàm Seed dữ liệu (Tạo Admin, Member, Court...)
+        await DbInitializer.SeedAsync(services);
     }
     catch (Exception ex)
     {
