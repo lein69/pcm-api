@@ -147,7 +147,7 @@ using (var scope = app.Services.CreateScope())
         // [CỰC KỲ QUAN TRỌNG]
         // Dòng này sẽ XÓA SẠCH database cũ để sửa lỗi "relation already exists".
         // Sau khi web chạy ngon lành, hãy xóa dòng này đi để tránh mất dữ liệu.
-        db.Database.EnsureDeleted(); 
+        //db.Database.EnsureDeleted(); 
 
         // Tạo lại database mới tinh từ đầu
         db.Database.Migrate();
