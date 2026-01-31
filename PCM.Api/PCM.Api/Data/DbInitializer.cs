@@ -8,11 +8,11 @@ namespace PCM.Api.Data
     {
         public static async Task SeedAsync(IServiceProvider serviceProvider)
         {
-            using var scope = serviceProvider.CreateScope();
+            Console.WriteLine(">>> START SEEDING DATABASE <<<");
 
-            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var context = serviceProvider.GetRequiredService<ApplicationDbContext>();
+            var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
             // ================= ROLES =================
 
@@ -26,7 +26,7 @@ namespace PCM.Api.Data
                 }
             }
 
-            // ================= ADMIN =================
+            // ================= ADMIN USER =================
 
             var adminUser = await userManager.FindByNameAsync("admin");
 
@@ -234,6 +234,8 @@ namespace PCM.Api.Data
                     await context.SaveChangesAsync();
                 }
             }
+
+            Console.WriteLine(">>> END SEEDING DATABASE <<<");
         }
     }
 }
