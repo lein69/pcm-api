@@ -158,6 +158,13 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+// ================= MIGRATIONS =================
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+}
+
 
 // ================= MIDDLEWARE =================
 
