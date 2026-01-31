@@ -10,13 +10,8 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ================= PORT (RAILWAY) =================
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-builder.WebHost.UseUrls($"http://*:{port}");
-
-
-// ================= DATABASE (POSTGRES - RAILWAY) =================
+// ================= DATABASE =================
 
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
@@ -35,7 +30,8 @@ if (!string.IsNullOrWhiteSpace(databaseUrl))
         Username = userInfo[0],
         Password = userInfo[1],
         Database = uri.AbsolutePath.TrimStart('/'),
-        SslMode = SslMode.Require
+        SslMode = SslMode.Require,
+        TrustServerCertificate = true
     }.ConnectionString;
 }
 else
@@ -46,14 +42,25 @@ else
         ?? throw new Exception("No DB connection string found");
 }
 
+
+// ================= DB CONTEXT =================
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseNpgsql(connectionString);
 });
 
+
 // ================= SERVICES =================
 
 builder.Services.AddScoped<IMatchService, MatchService>();
+
+
+// ================= IDENTITY =================
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
 
 // ================= JWT =================
@@ -99,10 +106,11 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .WithOrigins("https://pcm-pickleball.netlify.app")
+            .WithOrigins(
+                "https://pcm-pickleball.netlify.app"
+            )
             .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+            .AllowAnyMethod();
     });
 });
 
@@ -146,20 +154,9 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 
-// ================= BUILD APP =================
+// ================= BUILD =================
 
 var app = builder.Build();
-
-
-// ================= AUTO MIGRATE =================
-
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider
-                  .GetRequiredService<ApplicationDbContext>();
-
-    db.Database.Migrate();
-}
 
 
 // ================= MIDDLEWARE =================
@@ -175,3 +172,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+// ================= END =================
