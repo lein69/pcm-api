@@ -107,14 +107,12 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .WithOrigins(
-                "https://pcm-pickleball.netlify.app"
-            )
-            .AllowAnyMethod()
+            .WithOrigins("https://pcm-pickleball.netlify.app")
             .AllowAnyHeader()
-            .AllowCredentials();
+            .AllowAnyMethod();
     });
 });
+
 
 
 // ================= SWAGGER =================
@@ -158,11 +156,10 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // ================= MIDDLEWARE =================
+app.UseCors("AllowFrontend");
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
-app.UseCors("AllowFrontend");
 
 if (!app.Environment.IsProduction())
 {
