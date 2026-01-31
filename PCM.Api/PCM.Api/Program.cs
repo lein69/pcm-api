@@ -2,20 +2,53 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 using PCM.Api.Data;
 using PCM.Api.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ================= PORT (RAILWAY) =================
+
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 builder.WebHost.UseUrls($"http://*:{port}");
 
+// ================= DATABASE (POSTGRES) =================
 
-// ================= DATABASE =================
+var databaseUrl = Environment.GetEnvironmentVariable("postgresql://postgres:PymXmglHbWCokXWNvmKGCuaBXSvkcBtY@postgres-rz9n.railway.internal:5432/railway");
+
+string connectionString;
+
+if (!string.IsNullOrEmpty(databaseUrl))
+{
+    var uri = new Uri(databaseUrl);
+    var userInfo = uri.UserInfo.Split(':');
+
+    var csb = new NpgsqlConnectionStringBuilder
+    {
+        Host = uri.Host,
+        Port = uri.Port,
+        Username = userInfo[0],
+        Password = userInfo[1],
+        Database = uri.AbsolutePath.TrimStart('/'),
+        SslMode = SslMode.Require,
+        TrustServerCertificate = true
+    };
+
+    connectionString = csb.ConnectionString;
+}
+else
+{
+    // Local fallback (chạy local)
+    connectionString =
+        builder.Configuration.GetConnectionString("DefaultConnection")!;
+}
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    options.UseNpgsql(connectionString);
+});
 
 // ================= IDENTITY =================
 
@@ -39,7 +72,7 @@ if (string.IsNullOrEmpty(jwtKey))
 var jwtIssuer = builder.Configuration.GetValue<string>("Jwt:Issuer") ?? "PCM.Api";
 var jwtAudience = builder.Configuration.GetValue<string>("Jwt:Audience") ?? "PCM.Client";
 
-// ================= AUTHENTICATION =================
+// ================= AUTH =================
 
 builder.Services.AddAuthentication(options =>
 {
@@ -73,10 +106,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.SetIsOriginAllowed(origin => true)
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .AllowCredentials();
+        policy.SetIsOriginAllowed(_ => true)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
@@ -92,7 +125,6 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1"
     });
 
-    // JWT Auth for Swagger
     options.AddSecurityDefinition("Bearer", new()
     {
         Name = "Authorization",
@@ -119,24 +151,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-
-
 var app = builder.Build();
-
-// ================= SEED DATA =================
-// using (var scope = app.Services.CreateScope())
-// {
-//     var services = scope.ServiceProvider;
-//     try
-//     {
-//         await DbInitializer.SeedAsync(services);
-//     }
-//     catch (Exception ex)
-//     {
-//         var logger = services.GetRequiredService<ILogger<Program>>();
-//         logger.LogError(ex, "An error occurred while seeding the database.");
-//     }
-// }
 
 // ================= MIDDLEWARE =================
 
