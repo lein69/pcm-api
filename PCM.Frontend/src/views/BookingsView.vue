@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useDataStore } from '../stores/data'
-import apiClient from '../api' // Giả sử bạn tạo file api.ts
+import api from "@/api"
 
 const dataStore = useDataStore()
 
@@ -41,7 +41,7 @@ const createBooking = async () => {
 
   isSubmitting.value = true
   try {
-    await apiClient.post('/bookings', {
+    await api.post('/bookings', {
       ...newBooking.value,
       startTime: new Date(newBooking.value.startTime),
       endTime: new Date(newBooking.value.endTime)
@@ -100,9 +100,11 @@ const getStatusText = (status: string) => {
       return status || 'Không xác định'
   }
 }
+
 </script>
 
 <template>
+  
   <div class="bookings-view">
     <div class="header">
       <h1>📅 Quản lý đặt sân</h1>

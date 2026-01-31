@@ -1,31 +1,35 @@
-import axios from 'axios';
+import axios, { type AxiosInstance } from "axios";
 
-const apiClient = axios.create({
-  // Sử dụng biến môi trường hoặc fallback về localhost
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://localhost:7183/api',
-  headers: {
-    'Content-Type': 'application/json'
-  }
+const api: AxiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL as string,
+  withCredentials: true,
 });
 
-// Request interceptor: Tự động thêm token vào header
-apiClient.interceptors.request.use(
+// ================= INTERCEPTORS =================
+
+// Request: Gắn token
+api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Response interceptor: Xử lý lỗi chung (ví dụ: 401 Unauthorized)
-apiClient.interceptors.response.use(
+// Response: Xử lý lỗi chung
+api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Có thể handle 401 ở đây sau
     return Promise.reject(error);
   }
 );
 
-export default apiClient;
+// ================= EXPORT =================
+
+export default api;

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useDataStore } from '../stores/data'
-import axios from 'axios'
+import api from "@/api";
+
 
 const dataStore = useDataStore()
 

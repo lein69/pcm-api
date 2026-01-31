@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useDataStore } from '../stores/data'
-import axios from 'axios'
+import api from "@/api"
 
 const dataStore = useDataStore()
 const newCourt = ref({ name: '', description: '' })
@@ -18,7 +18,7 @@ onMounted(() => {
 
 const createCourt = async () => {
   try {
-    await axios.post('http://localhost:5000/api/courts', newCourt.value)
+    await api.post('/courts', newCourt.value)
     dataStore.fetchCourts()
     newCourt.value = { name: '', description: '' }
   } catch (error) {
