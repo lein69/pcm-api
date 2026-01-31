@@ -45,10 +45,16 @@ else
         builder.Configuration.GetConnectionString("DefaultConnection")!;
 }
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+var dbUrl = Environment.GetEnvironmentVariable("postgresql://postgres:PymXmglHbWCokXWNvmKGCuaBXSvkcBtY@postgres-rz9n.railway.internal:5432/railway");
+
+if (string.IsNullOrEmpty(dbUrl))
 {
-    options.UseNpgsql(connectionString);
-});
+    throw new Exception("DATABASE_URL not found");
+}
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(dbUrl));
+
 
 // ================= IDENTITY =================
 
@@ -156,6 +162,14 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // ================= MIDDLEWARE =================
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider
+                  .GetRequiredService<ApplicationDbContext>();
+
+    db.Database.Migrate();
+}
+
 app.UseCors("AllowFrontend");
 
 app.UseSwagger();
